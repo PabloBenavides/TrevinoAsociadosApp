@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
 import javax.swing.filechooser.FileFilter;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -42,6 +43,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class Principal extends javax.swing.JFrame {
     
     File file_source;
+    File directory;
     File file_capacitadores;
     
     Integer total_rows = 0;
@@ -78,19 +80,14 @@ public class Principal extends javax.swing.JFrame {
         txtFile = new javax.swing.JTextField();
         btnSel = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
-        txtFileDuda = new javax.swing.JTextField();
-        btnSel2 = new javax.swing.JButton();
+        txtFileDestino = new javax.swing.JTextField();
+        btnSelDestino = new javax.swing.JButton();
         progressBar = new javax.swing.JProgressBar();
         lblInfo = new javax.swing.JLabel();
         chkAcomodar = new javax.swing.JCheckBox();
         btnIniciar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jButton3 = new javax.swing.JButton();
 
         jButton1.setText("jButton1");
 
@@ -112,11 +109,16 @@ public class Principal extends javax.swing.JFrame {
             }
         });
 
-        jLabel3.setText("Archivo con nombres dudosos:");
+        jLabel3.setText("Destino:");
 
-        txtFileDuda.setEditable(false);
+        txtFileDestino.setEditable(false);
 
-        btnSel2.setText("Seleccionar");
+        btnSelDestino.setText("Seleccionar");
+        btnSelDestino.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSelDestinoActionPerformed(evt);
+            }
+        });
 
         lblInfo.setText("-");
 
@@ -149,17 +151,17 @@ public class Principal extends javax.swing.JFrame {
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(jLabel2)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(txtFile))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel3)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(txtFileDuda, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)))
-                                .addGap(10, 10, 10)
+                                        .addComponent(txtFileDestino))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jLabel2)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(txtFile)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(btnSel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(btnSel2, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)))
+                                    .addComponent(btnSelDestino, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)))
                             .addComponent(lblInfo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())
@@ -184,8 +186,8 @@ public class Principal extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(txtFileDuda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnSel2))
+                    .addComponent(txtFileDestino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSelDestino))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -204,58 +206,15 @@ public class Principal extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Reportes", jPanel1);
 
-        jLabel6.setText("Carpeta de Firmas:");
-
-        jLabel7.setText("Ruta de Reporte:");
-
-        jTextField1.setEditable(false);
-        jTextField1.setText("/firmas");
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
-            }
-        });
-
-        jTextField2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField2ActionPerformed(evt);
-            }
-        });
-
-        jButton3.setText("Buscar");
-
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 337, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel7)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField2)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton3)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGap(0, 532, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton3))
-                .addContainerGap(170, Short.MAX_VALUE))
+            .addGap(0, 230, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("Configuracion", jPanel2);
@@ -316,7 +275,7 @@ public class Principal extends javax.swing.JFrame {
 
         if (capacitadores.size() > 0) {
 
-            if (file_source != null) {
+            if (file_source != null || directory!=null ) {
 
                 String nameOfFile;
                 File file;
@@ -339,6 +298,12 @@ public class Principal extends javax.swing.JFrame {
 
                     rows = sheet.getLastRowNum() + 1;
                     cols = sheet.getRow(0).getLastCellNum();
+                    
+                    progressBar.setMinimum(0);
+                    progressBar.setMaximum(rows);
+                    progressBar.setValue(0);
+                    progressBar.setStringPainted(true);
+                    
 
                     for (int row = 1; row < rows; row++) {
 
@@ -363,9 +328,9 @@ public class Principal extends javax.swing.JFrame {
 
                         repo.setEmpleado_id(sheet.getRow(row).getCell(0).getStringCellValue());
                         repo.setNombre(sheet.getRow(row).getCell(1).getStringCellValue().toUpperCase());
-                        repo.setCurp(sheet.getRow(row).getCell(2).getStringCellValue());
-                        repo.setPuesto(sheet.getRow(row).getCell(3).getStringCellValue());
-                        repo.setCurso(sheet.getRow(row).getCell(4).getStringCellValue());
+                        repo.setCurp(sheet.getRow(row).getCell(2).getStringCellValue().toUpperCase());
+                        repo.setPuesto(sheet.getRow(row).getCell(3).getStringCellValue().toUpperCase());
+                        repo.setCurso(sheet.getRow(row).getCell(4).getStringCellValue().toUpperCase());
                         repo.setDuracion(sheet.getRow(row).getCell(5).getStringCellValue());
                         repo.setFecha_inicio(sheet.getRow(row).getCell(6).getDateCellValue());
                         repo.setFecha_fin(sheet.getRow(row).getCell(7).getDateCellValue());
@@ -377,7 +342,7 @@ public class Principal extends javax.swing.JFrame {
                             String name_correct = ParserName.parserSimpleName(repo.getNombre());
                             
                             if(name_correct.equals("Nombre no especificado")){
-                                erroneosList.add(repo.getEmpleado_id());
+                                System.out.println(" -- " + name_correct);
                             }else{
                                 repo.setNombre(name_correct);
                             }
@@ -388,9 +353,11 @@ public class Principal extends javax.swing.JFrame {
                         }
                         
                         if(repo.getCurp() == null){
+                            erroneosList.add(repo.getEmpleado_id());
                             continue;
                         }else{
-                            if(repo.getCurp().isEmpty()){
+                            if(repo.getCurp().length()<18){
+                                erroneosList.add(repo.getEmpleado_id());
                                 continue;
                             }
                         }
@@ -403,7 +370,7 @@ public class Principal extends javax.swing.JFrame {
                             if (repo.getRegion().equals(capacitador.getRegion())) {
                                 repo.setZona(capacitador.getZona());
                                 repo.setJefatura(capacitador.getJefatura());
-                                repo.setNombre_capacitador(capacitador.getNombre());
+                                repo.setNombre_capacitador(capacitador.getNombre().toUpperCase());
 //                                repo.setEmpleado_id(capacitador.getEmpleado_id());
                                 repo.setCorreo(capacitador.getCorreo());
                                 repo.setRegion_capacitador(capacitador.getRegion());
@@ -431,7 +398,7 @@ public class Principal extends javax.swing.JFrame {
                             JasperReport report_pdf = (JasperReport) JRLoader.loadObject(bufferedInputStream);
 
                             JasperPrint jasperPrint = JasperFillManager.fillReport(report_pdf, params, new JRBeanCollectionDataSource(reporte));
-                            JasperExportManager.exportReportToPdfFile(jasperPrint, row + "_" + repo.getCurp() +".pdf");
+                            JasperExportManager.exportReportToPdfFile(jasperPrint, directory + File.separator + repo.getEmpleado_id() + "_" + repo.getCurso()+".pdf");
 
                         } catch (Exception ex) {
                             ex.printStackTrace();
@@ -449,6 +416,7 @@ public class Principal extends javax.swing.JFrame {
 
                     }
                     System.out.println("Proceso terminado. TOTAL ROWS LEIDAS :  " + process_rows);
+                    System.out.println("Empleados erroneos " +  erroneosList.toString());
 
                 } catch (IOException ex) {
                     ex.printStackTrace();
@@ -456,7 +424,7 @@ public class Principal extends javax.swing.JFrame {
                 }
 
             } else {
-                ManageDialogsSwing.errorMessage("Atencion", "Debe seleccionar un archivo correcto para iniciar el proceso.");
+                ManageDialogsSwing.errorMessage("Atencion", "Debe seleccionar un archivo/directorio destino correcto para iniciar el proceso.");
             }
 
         } else {
@@ -465,13 +433,20 @@ public class Principal extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btnIniciarActionPerformed
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
-
-    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField2ActionPerformed
+    private void btnSelDestinoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelDestinoActionPerformed
+        
+        JFileChooser fchooser = new JFileChooser();
+        fchooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fchooser.setCurrentDirectory(new File(new File("").getAbsolutePath()));
+        fchooser.setDialogTitle("Seleccione un directorio destino para los archivos generados.");
+        int result = fchooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            
+            directory = fchooser.getSelectedFile();
+            txtFileDestino.setText(directory.getAbsolutePath());
+        }
+        
+    }//GEN-LAST:event_btnSelDestinoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -512,24 +487,19 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnIniciar;
     private javax.swing.JButton btnSel;
-    private javax.swing.JButton btnSel2;
+    private javax.swing.JButton btnSelDestino;
     private javax.swing.JCheckBox chkAcomodar;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
     private javax.swing.JLabel lblInfo;
     private javax.swing.JProgressBar progressBar;
     private javax.swing.JTextField txtFile;
-    private javax.swing.JTextField txtFileDuda;
+    private javax.swing.JTextField txtFileDestino;
     // End of variables declaration//GEN-END:variables
 
     
