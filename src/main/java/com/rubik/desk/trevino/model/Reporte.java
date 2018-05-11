@@ -70,7 +70,24 @@ public class Reporte {
     }
 
     public void setCurso(String curso) {
-        this.curso = curso;
+        this.curso = curso
+                .replace("/", " - ")
+                .replace("¿", "")
+                .replace("?", "")
+                .replace("¡", "")
+                .replace("!", "")
+                .replace("+", "")
+                .replace("*", "")
+                .replace("[", "")
+                .replace("]", "")
+                .replace("{", "")
+                .replace("}", "")
+                .replace(".", "")
+                .replace(",", "")
+                .replace(";", "")
+                .replace(">", "")
+                .replace("<", "")
+                .replace(":", "");
     }
 
     public String getDuracion() {

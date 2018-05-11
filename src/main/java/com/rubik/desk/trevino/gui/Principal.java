@@ -7,23 +7,27 @@
 package com.rubik.desk.trevino.gui;
 
 import com.rubik.desk.trevino.model.Capacitador;
+import com.rubik.desk.trevino.model.Puesto;
 import com.rubik.desk.trevino.model.Reporte;
 import com.rubik.desk.trevino.model.Seguridad;
 import com.rubik.file.FileTypeFilter;
 import com.rubik.manage.ManageDialogsSwing;
+import com.rubik.manage.ManageNumbers;
 import com.rubik.parser.ParserName;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
 import javax.swing.filechooser.FileFilter;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -31,8 +35,11 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -46,6 +53,8 @@ public class Principal extends javax.swing.JFrame {
     File directory;
     File file_capacitadores;
     
+    File file_err = new File("Empleados_sin_curp.xlsx");
+    
     Integer total_rows = 0;
     Integer process_rows = 0;
     
@@ -53,10 +62,16 @@ public class Principal extends javax.swing.JFrame {
     Seguridad seguridad;
     ArrayList<String> erroneosList;
     
+    ArrayList<Puesto> puestos;
+    
+    Thread t;
+    
     public static Vector<Reporte> reporte = new Vector<>();
 
     /** Creates new form Principal */
     public Principal() {
+        
+        fillEmpleo();
         initComponents();
         
         file_capacitadores = new File("capacitadores.xlsx");
@@ -82,12 +97,12 @@ public class Principal extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         txtFileDestino = new javax.swing.JTextField();
         btnSelDestino = new javax.swing.JButton();
-        progressBar = new javax.swing.JProgressBar();
         lblInfo = new javax.swing.JLabel();
         chkAcomodar = new javax.swing.JCheckBox();
         btnIniciar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        txtIniciarEn = new javax.swing.JTextField();
 
         jButton1.setText("jButton1");
 
@@ -102,6 +117,7 @@ public class Principal extends javax.swing.JFrame {
 
         txtFile.setEditable(false);
 
+        btnSel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/table_excel.png"))); // NOI18N
         btnSel.setText("Abrir");
         btnSel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -113,6 +129,7 @@ public class Principal extends javax.swing.JFrame {
 
         txtFileDestino.setEditable(false);
 
+        btnSelDestino.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/folder.png"))); // NOI18N
         btnSelDestino.setText("Seleccionar");
         btnSelDestino.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -125,6 +142,7 @@ public class Principal extends javax.swing.JFrame {
         chkAcomodar.setSelected(true);
         chkAcomodar.setText("Acomodar nombres");
 
+        btnIniciar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/accept.png"))); // NOI18N
         btnIniciar.setText("Iniciar");
         btnIniciar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -132,12 +150,17 @@ public class Principal extends javax.swing.JFrame {
             }
         });
 
+        btnCancelar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/cancel.png"))); // NOI18N
         btnCancelar.setText("Cancelar");
         btnCancelar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCancelarActionPerformed(evt);
             }
         });
+
+        jLabel4.setText("Iniciar en fila:");
+
+        txtIniciarEn.setText("0");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -148,32 +171,33 @@ public class Principal extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblInfo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jLabel4)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(txtIniciarEn, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel3)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(txtFileDestino))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel2)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(txtFile)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(btnIniciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(btnSel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(btnSelDestino, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)))
-                            .addComponent(lblInfo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(btnSelDestino, javax.swing.GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE))))
                         .addContainerGap())
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(chkAcomodar)
-                        .addGap(0, 405, Short.MAX_VALUE))))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnCancelar)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnIniciar, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                        .addGap(0, 430, Short.MAX_VALUE))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -188,36 +212,21 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(jLabel3)
                     .addComponent(txtFileDestino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnSelDestino))
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkAcomodar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 85, Short.MAX_VALUE)
-                        .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblInfo))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(57, 57, 57)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnCancelar)
-                            .addComponent(btnIniciar))
-                        .addContainerGap())))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkAcomodar)
+                .addGap(3, 3, 3)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnCancelar)
+                    .addComponent(btnIniciar)
+                    .addComponent(jLabel4)
+                    .addComponent(txtIniciarEn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblInfo))
         );
 
         jTabbedPane1.addTab("Reportes", jPanel1);
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 532, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 230, Short.MAX_VALUE)
-        );
-
-        jTabbedPane1.addTab("Configuracion", jPanel2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -244,8 +253,239 @@ public class Principal extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        if(t.isAlive()){
+            t.interrupt();
+            ManageDialogsSwing.errorMessage("Error", "Proceso detenido por el usuario.");
+        }
+    }//GEN-LAST:event_btnCancelarActionPerformed
+
+    private void btnIniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarActionPerformed
+
+        process_rows = 0;
+        erroneosList = new ArrayList<>();
+
+        fillCapacitadores_Seguridad();
+
+        if (capacitadores.size() > 0) {
+
+            if (file_source != null && directory!=null ) {
+
+                XSSFWorkbook workbook;
+                XSSFSheet sheet;
+                int rows;
+
+                try {
+                    FileInputStream fis = new FileInputStream(file_source);
+                    workbook = new XSSFWorkbook(fis);
+                    sheet = workbook.getSheetAt(0);
+                    rows = sheet.getLastRowNum() + 1;
+
+                    t = new Thread(new Runnable() {
+
+                        public void run() {
+
+                            btnIniciar.setEnabled(false);
+                            btnSel.setEnabled(false);
+                            btnSelDestino.setEnabled(false);
+
+                            for (int row = 1; row < rows; row++) {
+
+                                if(!"0".equals(txtIniciarEn.getText())){
+                                    row = ManageNumbers.stringToInteger(txtIniciarEn.getText())+1;
+                                }
+                                
+                                Reporte repo = new Reporte();
+                                if (sheet.getRow(row) == null) {
+                                    break;
+                                } else {
+                                    if ((sheet.getRow(row).getCell(1) == null) || sheet.getRow(row).getCell(1).toString().isEmpty()) {
+                                        break;
+                                    }
+                                }
+
+                                sheet.getRow(row).getCell(0).setCellType(Cell.CELL_TYPE_STRING);
+                                sheet.getRow(row).getCell(1).setCellType(Cell.CELL_TYPE_STRING);
+                                sheet.getRow(row).getCell(2).setCellType(Cell.CELL_TYPE_STRING);
+                                sheet.getRow(row).getCell(3).setCellType(Cell.CELL_TYPE_STRING);
+                                sheet.getRow(row).getCell(4).setCellType(Cell.CELL_TYPE_STRING);
+                                sheet.getRow(row).getCell(5).setCellType(Cell.CELL_TYPE_STRING);
+                                sheet.getRow(row).getCell(8).setCellType(Cell.CELL_TYPE_STRING);
+                                sheet.getRow(row).getCell(9).setCellType(Cell.CELL_TYPE_STRING);
+
+                                repo.setEmpleado_id(sheet.getRow(row).getCell(0).getStringCellValue());
+                                repo.setNombre(sheet.getRow(row).getCell(1).getStringCellValue().toUpperCase());
+                                repo.setCurp(sheet.getRow(row).getCell(2).getStringCellValue().toUpperCase());
+                                repo.setPuesto(sheet.getRow(row).getCell(3).getStringCellValue().toUpperCase());
+                                repo.setCurso(sheet.getRow(row).getCell(4).getStringCellValue().toUpperCase());
+                                repo.setDuracion(sheet.getRow(row).getCell(5).getStringCellValue());
+                                repo.setFecha_inicio(sheet.getRow(row).getCell(6).getDateCellValue());
+                                repo.setFecha_fin(sheet.getRow(row).getCell(7).getDateCellValue());
+                                repo.setCine(sheet.getRow(row).getCell(8).getStringCellValue());
+                                repo.setRegion(sheet.getRow(row).getCell(9).getStringCellValue().replace("GR-", ""));
+
+                                if (chkAcomodar.isSelected()) {
+                                    String name_correct = ParserName.parserSimpleName(repo.getNombre());
+
+                                    if (name_correct.equals("Nombre no especificado")) {
+                                        System.out.println(" -- " + name_correct);
+                                    } else {
+                                        repo.setNombre(name_correct);
+                                    }
+                                }
+
+                                if (repo.getRegion().substring(0, 1).equals("0")) {
+                                    repo.setRegion(repo.getRegion().replace("0", ""));
+                                }
+
+                                if (repo.getCurp() == null) {
+                                    erroneosList.add(repo.getEmpleado_id());
+                                    continue;
+                                } else {
+                                    if (repo.getCurp().length() < 18) {
+                                        erroneosList.add(repo.getEmpleado_id());
+                                        continue;
+                                    }
+                                }
+
+                                repo.setCorreo("121010802");
+                                for (Puesto puesto : puestos) {
+                                    if(repo.getPuesto().equals(puesto.getNombre())){
+                                        repo.setCorreo(puesto.getClave());
+                                        break;
+                                    }
+                                }
+
+                                SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd");
+                                repo.setF_inicio(dt.format(repo.getFecha_inicio()));
+                                repo.setF_fin(dt.format(repo.getFecha_fin()));
+
+                                for (Capacitador capacitador : capacitadores) {
+                                    if (repo.getRegion().equals(capacitador.getRegion())) {
+                                        repo.setJefatura(capacitador.getJefatura());
+                                        repo.setNombre_capacitador(capacitador.getNombre().toUpperCase());
+                                        repo.setRegion_capacitador(capacitador.getRegion());
+                                        repo.setUbicacion(capacitador.getUbicacion());
+                                        repo.setFile(capacitador.getFile());
+                                        repo.setSeguridad_nombre(seguridad.getNombre());
+                                        repo.setSeguridad_file(seguridad.getFile());
+                                        break;
+                                    }
+                                }
+
+                                if("COMISIÓN DE SEGURIDAD E HIGIENE".equals(repo.getCurso())){
+                                    repo.setZona("6000");
+                                    repo.setNombre_capacitador(repo.getSeguridad_nombre());
+                                    repo.setFile("SEGURIDAD");
+                                }else{
+                                    repo.setZona("2000");
+                                }
+
+                                reporte = new Vector<>();
+                                reporte.add(repo);
+
+                                System.out.println(row + " - " + repo.toString());
+
+                                // Generar Archivo
+                                Map<String, Object> params = new HashMap<String, Object>();
+                                try {
+                                    FileInputStream fis_report = new FileInputStream("reports/formato_DC-3.jasper");
+                                    BufferedInputStream bufferedInputStream = new BufferedInputStream(fis_report);
+                                    JasperReport report_pdf = (JasperReport) JRLoader.loadObject(bufferedInputStream);
+
+                                    JasperPrint jasperPrint = JasperFillManager.fillReport(report_pdf, params, new JRBeanCollectionDataSource(reporte));
+                                    
+                                    File fTemp = new File(directory + File.separator + repo.getEmpleado_id() + "_" + repo.getCurso() + ".pdf");
+                                    
+                                    if(fTemp.exists()){
+                                        JasperExportManager.exportReportToPdfFile(jasperPrint, directory + File.separator + repo.getEmpleado_id() + "_" + row + "_" + repo.getCurso() + ".pdf");                                        
+                                    }else{
+                                        JasperExportManager.exportReportToPdfFile(jasperPrint, directory + File.separator + repo.getEmpleado_id() + "_" + repo.getCurso() + ".pdf");
+                                    }
+
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
+                                    String er = "";
+                                    for (int i = 0; i < ex.getStackTrace().length; i++) {
+                                        er += ex.getStackTrace()[i].toString() + "\n";
+                                    }
+                                    erroneosList.add(repo.getEmpleado_id() + "_Error en fotografia");
+//                                    ManageDialogsSwing.errorMessage("Error", ex.toString());
+//                                    break;
+                                }
+
+                                process_rows++;
+                                progressBar.setIndeterminate(true);
+                                lblInfo.setText("Procesando " + process_rows + " filas de " + (rows-1));
+                            }
+
+                            btnIniciar.setEnabled(true);
+                            btnSel.setEnabled(true);
+                            btnSelDestino.setEnabled(true);
+                            progressBar.setIndeterminate(false);
+
+                            System.out.println("Proceso terminado. TOTAL ROWS LEIDAS :  " + process_rows);
+                            System.out.println("Empleados erroneos " +  erroneosList.toString());
+
+                            if (erroneosList.size() > 0) {
+                                ArrayList data = new ArrayList();
+                                ArrayList<String> headers = new ArrayList();
+                                headers.add("EMPLEADO ID");
+
+                                for (String err : erroneosList) {
+                                    ArrayList<String> cells = new ArrayList();
+                                    cells.add(err);
+                                    data.add(cells);
+                                }
+
+                                try {
+                                    
+                                    exportToExcel("Erroneos", headers, data, file_err);
+                                    
+                                } catch (Exception e) {
+                                    System.out.println(e.toString());
+                                    ManageDialogsSwing.errorMessage("Error", "Error ocurrido al guardar los Empleados con informacion incompleta.");
+                                }
+                            }
+                            
+                            ManageDialogsSwing.warningDialog("Atencion", "Proceso terminado.");
+
+                        }
+
+                    });
+                    t.start();
+
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    ManageDialogsSwing.errorMessage("Error", "Error ocurrido al cargar el archivo.");
+                }
+
+            } else {
+                ManageDialogsSwing.errorMessage("Atencion", "Debe seleccionar un archivo/directorio destino correcto para iniciar el proceso.");
+            }
+
+        } else {
+            ManageDialogsSwing.errorMessage("Atencion", "No se pudo leer el archivo 'capacitadores.xlsx' favor de revisar que exista y que tenga el formato correcto.");
+        }
+    }//GEN-LAST:event_btnIniciarActionPerformed
+
+    private void btnSelDestinoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelDestinoActionPerformed
+
+        JFileChooser fchooser = new JFileChooser();
+        fchooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fchooser.setCurrentDirectory(new File(new File("").getAbsolutePath()));
+        fchooser.setDialogTitle("Seleccione un directorio destino para los archivos generados.");
+        int result = fchooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+
+            directory = fchooser.getSelectedFile();
+            txtFileDestino.setText(directory.getAbsolutePath());
+        }
+
+    }//GEN-LAST:event_btnSelDestinoActionPerformed
+
     private void btnSelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelActionPerformed
-        
+
         JFileChooser fchooser = new JFileChooser();
         FileFilter xlsxFilter = new FileTypeFilter(".xlsx", "Microsoft Excel Documents");
         FileFilter xlsFilter = new FileTypeFilter(".xls", "Microsoft Excel Documents ");
@@ -256,197 +496,12 @@ public class Principal extends javax.swing.JFrame {
         fchooser.setDialogTitle("Seleccione el Archivo de SAP con el Layout establecido:");
         int result = fchooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
-            
+
             file_source = fchooser.getSelectedFile();
             txtFile.setText(file_source.getName());
         }
-        
+
     }//GEN-LAST:event_btnSelActionPerformed
-
-    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnCancelarActionPerformed
-
-    private void btnIniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarActionPerformed
-
-        erroneosList = new ArrayList<>();
-        
-        fillCapacitadores_Seguridad();
-
-        if (capacitadores.size() > 0) {
-
-            if (file_source != null || directory!=null ) {
-
-                String nameOfFile;
-                File file;
-                String extension;
-
-                ArrayList<Object> objects;
-                XSSFWorkbook workbook;
-                XSSFSheet sheet;
-                XSSFCell celdaCurso;
-                String valorCeldaCurso;
-                int rows;
-                int cols;
-
-                try {
-                    FileInputStream fis = new FileInputStream(file_source);
-                    workbook = new XSSFWorkbook(fis);
-                    sheet = workbook.getSheetAt(0);
-                    celdaCurso = null;
-                    valorCeldaCurso = null;
-
-                    rows = sheet.getLastRowNum() + 1;
-                    cols = sheet.getRow(0).getLastCellNum();
-                    
-                    progressBar.setMinimum(0);
-                    progressBar.setMaximum(rows);
-                    progressBar.setValue(0);
-                    progressBar.setStringPainted(true);
-                    
-
-                    for (int row = 1; row < rows; row++) {
-
-                        Reporte repo = new Reporte();
-
-                        if (sheet.getRow(row) == null) {
-                            break;
-                        } else {
-                            if ((sheet.getRow(row).getCell(1) == null) || sheet.getRow(row).getCell(1).toString().isEmpty()) {
-                                break;
-                            }
-                        }
-
-                        sheet.getRow(row).getCell(0).setCellType(Cell.CELL_TYPE_STRING);
-                        sheet.getRow(row).getCell(1).setCellType(Cell.CELL_TYPE_STRING);
-                        sheet.getRow(row).getCell(2).setCellType(Cell.CELL_TYPE_STRING);
-                        sheet.getRow(row).getCell(3).setCellType(Cell.CELL_TYPE_STRING);
-                        sheet.getRow(row).getCell(4).setCellType(Cell.CELL_TYPE_STRING);
-                        sheet.getRow(row).getCell(5).setCellType(Cell.CELL_TYPE_STRING);
-                        sheet.getRow(row).getCell(8).setCellType(Cell.CELL_TYPE_STRING);
-                        sheet.getRow(row).getCell(9).setCellType(Cell.CELL_TYPE_STRING);
-
-                        repo.setEmpleado_id(sheet.getRow(row).getCell(0).getStringCellValue());
-                        repo.setNombre(sheet.getRow(row).getCell(1).getStringCellValue().toUpperCase());
-                        repo.setCurp(sheet.getRow(row).getCell(2).getStringCellValue().toUpperCase());
-                        repo.setPuesto(sheet.getRow(row).getCell(3).getStringCellValue().toUpperCase());
-                        repo.setCurso(sheet.getRow(row).getCell(4).getStringCellValue().toUpperCase());
-                        repo.setDuracion(sheet.getRow(row).getCell(5).getStringCellValue());
-                        repo.setFecha_inicio(sheet.getRow(row).getCell(6).getDateCellValue());
-                        repo.setFecha_fin(sheet.getRow(row).getCell(7).getDateCellValue());
-                        repo.setCine(sheet.getRow(row).getCell(8).getStringCellValue());
-                        repo.setRegion(sheet.getRow(row).getCell(9).getStringCellValue().replace("GR-", ""));
-
-                        if(chkAcomodar.isSelected()){
-                            
-                            String name_correct = ParserName.parserSimpleName(repo.getNombre());
-                            
-                            if(name_correct.equals("Nombre no especificado")){
-                                System.out.println(" -- " + name_correct);
-                            }else{
-                                repo.setNombre(name_correct);
-                            }
-                        }
-                        
-                        if (repo.getRegion().substring(0, 1).equals("0")) {
-                            repo.setRegion(repo.getRegion().replace("0", ""));
-                        }
-                        
-                        if(repo.getCurp() == null){
-                            erroneosList.add(repo.getEmpleado_id());
-                            continue;
-                        }else{
-                            if(repo.getCurp().length()<18){
-                                erroneosList.add(repo.getEmpleado_id());
-                                continue;
-                            }
-                        }
-
-                        SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd");
-                        repo.setF_inicio(dt.format(repo.getFecha_inicio()));
-                        repo.setF_fin(dt.format(repo.getFecha_fin()));
-
-                        for (Capacitador capacitador : capacitadores) {
-                            if (repo.getRegion().equals(capacitador.getRegion())) {
-                                repo.setZona(capacitador.getZona());
-                                repo.setJefatura(capacitador.getJefatura());
-                                repo.setNombre_capacitador(capacitador.getNombre().toUpperCase());
-//                                repo.setEmpleado_id(capacitador.getEmpleado_id());
-                                repo.setCorreo(capacitador.getCorreo());
-                                repo.setRegion_capacitador(capacitador.getRegion());
-                                repo.setUbicacion(capacitador.getUbicacion());
-                                repo.setFile(capacitador.getFile());
-
-                                repo.setSeguridad_nombre(seguridad.getNombre());
-                                repo.setSeguridad_file(seguridad.getFile());
-
-                                break;
-                            }
-                        }
-
-                        reporte = new Vector<>();
-                        reporte.add(repo);
-
-                        System.out.println(row + " - " + repo.toString());
-
-                        // Generar Archivo
-                        Map<String, Object> params = new HashMap<String, Object>();
-
-                        try {
-                            FileInputStream fis_report = new FileInputStream("reports/formato_DC-3.jasper");
-                            BufferedInputStream bufferedInputStream = new BufferedInputStream(fis_report);
-                            JasperReport report_pdf = (JasperReport) JRLoader.loadObject(bufferedInputStream);
-
-                            JasperPrint jasperPrint = JasperFillManager.fillReport(report_pdf, params, new JRBeanCollectionDataSource(reporte));
-                            JasperExportManager.exportReportToPdfFile(jasperPrint, directory + File.separator + repo.getEmpleado_id() + "_" + repo.getCurso()+".pdf");
-
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                            String er = "";
-                            for (int i = 0; i < ex.getStackTrace().length; i++) {
-                                er += ex.getStackTrace()[i].toString() + "\n";
-                            }
-
-                            ManageDialogsSwing.errorMessage("Error", ex.toString());
-                            ManageDialogsSwing.errorMessage("Error", er);
-                            break;
-                        }
-
-                        process_rows++;
-
-                    }
-                    System.out.println("Proceso terminado. TOTAL ROWS LEIDAS :  " + process_rows);
-                    System.out.println("Empleados erroneos " +  erroneosList.toString());
-
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(this, "Error ocurrido al cargar el archivo.", "ATENCION", JOptionPane.ERROR_MESSAGE);
-                }
-
-            } else {
-                ManageDialogsSwing.errorMessage("Atencion", "Debe seleccionar un archivo/directorio destino correcto para iniciar el proceso.");
-            }
-
-        } else {
-            ManageDialogsSwing.errorMessage("Atencion", "No se pudo leer el archivo 'capacitadores.xlsx' favor de revisar que exista y que tenga el formato correcto.");
-        }
-
-    }//GEN-LAST:event_btnIniciarActionPerformed
-
-    private void btnSelDestinoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelDestinoActionPerformed
-        
-        JFileChooser fchooser = new JFileChooser();
-        fchooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fchooser.setCurrentDirectory(new File(new File("").getAbsolutePath()));
-        fchooser.setDialogTitle("Seleccione un directorio destino para los archivos generados.");
-        int result = fchooser.showOpenDialog(this);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            
-            directory = fchooser.getSelectedFile();
-            txtFileDestino.setText(directory.getAbsolutePath());
-        }
-        
-    }//GEN-LAST:event_btnSelDestinoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -483,6 +538,13 @@ public class Principal extends javax.swing.JFrame {
         });
     }
 
+    @Override
+    public Image getIconImage() {
+        Image retValue = Toolkit.getDefaultToolkit().
+                getImage(ClassLoader.getSystemResource("icons/rubikIcon3.png"));
+        return retValue;
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnIniciar;
@@ -493,42 +555,33 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel lblInfo;
-    private javax.swing.JProgressBar progressBar;
+    public final javax.swing.JProgressBar progressBar = new javax.swing.JProgressBar();
     private javax.swing.JTextField txtFile;
     private javax.swing.JTextField txtFileDestino;
+    private javax.swing.JTextField txtIniciarEn;
     // End of variables declaration//GEN-END:variables
 
+    
     
     public void fillCapacitadores_Seguridad(){
         
         capacitadores = new ArrayList<>();
         
         if (file_capacitadores.exists()) {
-            String nameOfFile;
-            File file;
-            String extension;
-
-            ArrayList<Object> objects;
             XSSFWorkbook workbook;
             XSSFSheet sheet;
-            XSSFCell celdaCurso;
-            String valorCeldaCurso;
             int rows;
-            int cols;
 
             try {
                 FileInputStream fis = new FileInputStream(file_capacitadores);
                 workbook = new XSSFWorkbook(fis);
                 sheet = workbook.getSheetAt(0);
-                celdaCurso = null;
-                valorCeldaCurso = null;
 
                 rows = sheet.getLastRowNum() + 1;
-                cols = sheet.getRow(0).getLastCellNum();
 
                 int row = 1;
                 for (row = 1; row < rows; row++) {
@@ -583,8 +636,104 @@ public class Principal extends javax.swing.JFrame {
         }
     }
     
+    public void fillEmpleo(){
+        
+        puestos = new ArrayList<>();
+        
+        puestos.add(new Puesto("121010802","AUXILIAR DE ALMACEN"));
+        puestos.add(new Puesto("121010802","AUXILIAR DE ORDENES"));
+        puestos.add(new Puesto("121010802","EMP GRAL PROYECCIONISTA"));
+        puestos.add(new Puesto("121010802","EMPLEADO GENERAL"));
+        puestos.add(new Puesto("121010802","EMPLEADO GENERAL TEMPORAL"));
+        puestos.add(new Puesto("121010802","EMPLEDO GRAL HORAS"));
+        puestos.add(new Puesto("121010802","EMPLEADO OPERATIVO L."));
+        puestos.add(new Puesto("713030500","GERENTE ENTRENAMIENTO"));
+        puestos.add(new Puesto("713030500","SUBGERENTE DUCLCERIA"));
+        puestos.add(new Puesto("713030500","SUPERVISOR DE ORDENES"));
+        puestos.add(new Puesto("713030500","SUPERVISOR DUL. Y ALIMENTOS"));
+        puestos.add(new Puesto("713030500","SUPERVISOR DULCERIA"));
+        puestos.add(new Puesto("713030500","SUPERVISOR ISLA COFFEE TREE"));
+        puestos.add(new Puesto("713030500","SUPERVISOR VENTA SALAS VIP"));
+        puestos.add(new Puesto("823050300","ENCARGADO A"));
+        puestos.add(new Puesto("823050300","ENCARGADO C"));
+        puestos.add(new Puesto("823050300","ENCARGADO DE ALMACEN"));
+        puestos.add(new Puesto("823050300","ENCARGADO DE CINE"));
+        puestos.add(new Puesto("823050300","GERENTE DE CONJUNTO A"));
+        puestos.add(new Puesto("823050300","GERENTE DE CONJUNTO B"));
+        puestos.add(new Puesto("823050300","GERENTE DE CONJUNTO C"));
+        puestos.add(new Puesto("823050300","GERENTE DE CONJUNTO JR"));
+        puestos.add(new Puesto("823050300","SUBERENTE"));
+        puestos.add(new Puesto("823050300","SUBGERENTE ADAMINISTRATIVO"));
+        puestos.add(new Puesto("823050300","SUBGERENTE OPERATIVO"));
+        puestos.add(new Puesto("823050300","SUBGERENTE RECURSOS HUMANOS"));
+        puestos.add(new Puesto("823050300","SUPERVISOR LIMPIEZA"));
+        puestos.add(new Puesto("823050300","SUPERVISOR OPERATIVO"));
+        puestos.add(new Puesto("825080301","ASISTENTE"));
+        puestos.add(new Puesto("825080301","AUXILIAR A"));
+        puestos.add(new Puesto("825080301","AUXILIAR OPERATIVO"));
+        puestos.add(new Puesto("825080301","EMPLEADO SPYRAL"));
+        puestos.add(new Puesto("825080301","ENCARGADO ISLA COFFEE TREE"));
+        puestos.add(new Puesto("825080301","SUPERVISOR ADMINISTRATIVO"));
+        puestos.add(new Puesto("825080301","SUPERVISOR REC. HUMANOS"));
+        puestos.add(new Puesto("825080301","SUPERVISOR SPYRAL"));
+        puestos.add(new Puesto("825080301","SUPERVISOR TECNOLOGIA"));
+        puestos.add(new Puesto("825080301","SUPERVISOR VALORES"));
+        
+    }
+    
     public static Vector<Reporte> generateCollection(){
         return reporte;
+    }
+
+    public void exportToExcel(String sheetName, ArrayList headers,
+            ArrayList data, File outputFile) {
+
+        FileOutputStream outs = null;
+        try {
+
+            outs = new FileOutputStream(outputFile);
+            XSSFWorkbook wb = new XSSFWorkbook();
+            XSSFSheet sheet = wb.createSheet(sheetName);
+
+            int rowIdx = 0;
+            short cellIdx = 0;
+
+            // Header
+            XSSFRow hssfHeader = sheet.createRow(rowIdx);
+            XSSFCellStyle cellStyle = wb.createCellStyle();
+            cellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+
+            for (Iterator cells = headers.iterator(); cells.hasNext();) {
+                XSSFCell hssfCell = hssfHeader.createCell(cellIdx++);
+                hssfCell.setCellStyle(cellStyle);
+                hssfCell.setCellValue((String) cells.next());
+            }
+            // Data
+            rowIdx = 1;
+            for (Iterator rows = data.iterator(); rows.hasNext();) {
+                ArrayList row = (ArrayList) rows.next();
+                XSSFRow hssfRow = sheet.createRow(rowIdx++);
+                cellIdx = 0;
+                for (Iterator cells = row.iterator(); cells.hasNext();) {
+                    XSSFCell hssfCell = hssfRow.createCell(cellIdx++);
+                    hssfCell.setCellValue((String) cells.next());
+                }
+            }
+
+            wb.setSheetName(0, sheetName);
+
+            try {
+
+                wb.write(outs);
+                outs.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
 }

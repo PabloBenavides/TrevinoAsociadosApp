@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b8c74ab7-4ede-4e5c-a996-51774507a2a5">
-	<property name="ireport.zoom" value="1.5"/>
-	<property name="ireport.x" value="8"/>
-	<property name="ireport.y" value="350"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DC-3" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b8c74ab7-4ede-4e5c-a996-51774507a2a5">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="948"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -125,7 +125,7 @@ CONSTANCIA DE COMPETENCIAS O DE HABILIDADES LABORALES
 				<text><![CDATA[DATOS DEL PROGRAMA DE CAPACITACIÓN, ADIESTRAMIENTO Y PRODUCTIVIDAD]]></text>
 			</staticText>
 			<rectangle>
-				<reportElement x="0" y="371" width="572" height="175" uuid="ae675b43-c8c1-43e3-accc-21ef1bd45d41"/>
+				<reportElement x="0" y="371" width="572" height="170" uuid="ae675b43-c8c1-43e3-accc-21ef1bd45d41"/>
 			</rectangle>
 			<line>
 				<reportElement x="0" y="56" width="572" height="1" uuid="186b17df-8d9c-46a9-ba8f-15573644e643"/>
@@ -151,7 +151,7 @@ CONSTANCIA DE COMPETENCIAS O DE HABILIDADES LABORALES
 				<text><![CDATA[Clave Única de Registro de Población]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="307" y="57" width="265" height="13" uuid="e10cc319-1bea-42d1-91af-1822f5dcb00e"/>
+				<reportElement x="307" y="57" width="262" height="13" uuid="e10cc319-1bea-42d1-91af-1822f5dcb00e"/>
 				<textElement>
 					<font fontName="Arial Narrow" size="9"/>
 				</textElement>
@@ -283,35 +283,35 @@ aquel que no se conduce con verdad.]]></text>
 				<text><![CDATA[ANA CRISTINA GUIZA]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="506" y="57" width="17" height="10" uuid="31c4be67-64a8-4d83-a448-5ed123a6f806"/>
+				<reportElement x="546" y="57" width="17" height="10" uuid="31c4be67-64a8-4d83-a448-5ed123a6f806"/>
 				<textElement>
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[1/]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="90" y="298" width="10" height="10" uuid="6a1d7a0a-84d8-474d-a372-6b8b070531d9"/>
+				<reportElement x="105" y="298" width="10" height="10" uuid="6a1d7a0a-84d8-474d-a372-6b8b070531d9"/>
 				<textElement>
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[2/]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="142" y="331" width="13" height="10" uuid="c79b254a-56af-4521-9e6c-d85af20de3b0"/>
+				<reportElement x="174" y="331" width="13" height="10" uuid="c79b254a-56af-4521-9e6c-d85af20de3b0"/>
 				<textElement>
-					<font size="7"/>
+					<font fontName="Arial Narrow" size="7"/>
 				</textElement>
 				<text><![CDATA[3/]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="339" y="417" width="17" height="10" uuid="d80d4d74-3e98-407a-b9bb-074e9d337ba1"/>
+				<reportElement x="360" y="417" width="17" height="10" uuid="d80d4d74-3e98-407a-b9bb-074e9d337ba1"/>
 				<textElement>
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[4/]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="539" y="417" width="17" height="10" uuid="496fb2a3-e0c1-496a-b410-b82850782b2e"/>
+				<reportElement x="558" y="417" width="13" height="9" uuid="496fb2a3-e0c1-496a-b410-b82850782b2e"/>
 				<textElement>
 					<font size="7"/>
 				</textElement>
@@ -325,14 +325,14 @@ aquel que no se conduce con verdad.]]></text>
 				<text><![CDATA[Instructor o Tutor]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="205" y="417" width="173" height="13" uuid="40cfeb6f-03bc-4837-8910-280c764c8a36"/>
+				<reportElement x="205" y="417" width="192" height="13" uuid="40cfeb6f-03bc-4837-8910-280c764c8a36"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial Narrow" size="9"/>
 				</textElement>
 				<text><![CDATA[Patrón o representante legal ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="398" y="417" width="164" height="13" uuid="f5408424-15b5-4a4c-8956-5e5d20a83aec"/>
+				<reportElement x="398" y="417" width="174" height="13" uuid="f5408424-15b5-4a4c-8956-5e5d20a83aec"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial Narrow" size="9"/>
 				</textElement>
@@ -704,13 +704,6 @@ aquel que no se conduce con verdad.]]></text>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{duracion}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="80" y="311" width="100" height="20" uuid="6791ae5f-2f6c-49fd-9285-92b7f6d3edf8"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial Narrow" size="11"/>
-				</textElement>
-				<text><![CDATA[6000]]></text>
-			</staticText>
 			<textField>
 				<reportElement x="8" y="345" width="554" height="21" uuid="9251acf4-677b-4790-9c9c-926b8a647196"/>
 				<textElement verticalAlignment="Middle">
@@ -924,14 +917,28 @@ aquel que no se conduce con verdad.]]></text>
 				</textElement>
 				<text><![CDATA[a]]></text>
 			</staticText>
+			<textField>
+				<reportElement x="307" y="70" width="264" height="17" uuid="9f872282-c3cb-4912-ab17-7fb430e2b922"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial Narrow" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{correo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="105" y="311" width="75" height="20" uuid="31490cb0-20e3-4821-a3e0-d60fa1b2c4e6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial Narrow" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{zona}]]></textFieldExpression>
+			</textField>
 		</band>
 	</columnHeader>
 	<columnFooter>
 		<band height="101" splitType="Stretch">
 			<staticText>
-				<reportElement x="6" y="6" width="556" height="95" uuid="0f712c7e-d8e9-4224-b86f-f37cec3b87c3"/>
+				<reportElement x="6" y="0" width="556" height="101" uuid="0f712c7e-d8e9-4224-b86f-f37cec3b87c3"/>
 				<textElement>
-					<font fontName="Arial Narrow" size="8"/>
+					<font fontName="Arial" size="7"/>
 				</textElement>
 				<text><![CDATA[INSTRUCCIONES
       - Llenar a máquina o con letra de molde.
