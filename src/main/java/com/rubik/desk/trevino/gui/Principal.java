@@ -35,6 +35,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -313,7 +314,7 @@ public class Principal extends javax.swing.JFrame {
                                 sheet.getRow(row).getCell(8).setCellType(Cell.CELL_TYPE_STRING);
                                 sheet.getRow(row).getCell(9).setCellType(Cell.CELL_TYPE_STRING);
 
-                                repo.setEmpleado_id(sheet.getRow(row).getCell(0).getStringCellValue());
+                                repo.setEmpleado_id( StringUtils.leftPad(sheet.getRow(row).getCell(0).getStringCellValue(),4,"0") );
                                 repo.setNombre(sheet.getRow(row).getCell(1).getStringCellValue().toUpperCase());
                                 repo.setCurp(sheet.getRow(row).getCell(2).getStringCellValue().toUpperCase());
                                 repo.setPuesto(sheet.getRow(row).getCell(3).getStringCellValue().toUpperCase());
@@ -398,7 +399,8 @@ public class Principal extends javax.swing.JFrame {
                                     File fTemp = new File(directory + File.separator + repo.getEmpleado_id() + "_" + repo.getCurso() + ".pdf");
                                     
                                     if(fTemp.exists()){
-                                        JasperExportManager.exportReportToPdfFile(jasperPrint, directory + File.separator + repo.getEmpleado_id() + "_" + row + "_" + repo.getCurso() + ".pdf");                                        
+                                        JasperExportManager.exportReportToPdfFile(jasperPrint, directory + File.separator + repo.getEmpleado_id() + "_" + repo.getCurso() + "_DUPLICADO" + (row-1) + ".pdf");
+                                        erroneosList.add(repo.getEmpleado_id() + "_DUPLICADO EN "  + (row-1) );
                                     }else{
                                         JasperExportManager.exportReportToPdfFile(jasperPrint, directory + File.separator + repo.getEmpleado_id() + "_" + repo.getCurso() + ".pdf");
                                     }
@@ -409,7 +411,7 @@ public class Principal extends javax.swing.JFrame {
                                     for (int i = 0; i < ex.getStackTrace().length; i++) {
                                         er += ex.getStackTrace()[i].toString() + "\n";
                                     }
-                                    erroneosList.add(repo.getEmpleado_id() + "_Error en fotografia");
+                                    erroneosList.add(repo.getEmpleado_id() + "_Error en Firma");
 //                                    ManageDialogsSwing.errorMessage("Error", ex.toString());
 //                                    break;
                                 }
