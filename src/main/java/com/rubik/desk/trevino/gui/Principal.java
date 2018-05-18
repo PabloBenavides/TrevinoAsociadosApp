@@ -49,7 +49,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  * @author Dev
  */
 public class Principal extends javax.swing.JFrame {
-    
+    int row = 0;
     File file_source;
     File directory;
     File file_capacitadores;
@@ -57,7 +57,6 @@ public class Principal extends javax.swing.JFrame {
     File file_err = new File("Empleados_sin_curp.xlsx");
     
     Integer total_rows = 0;
-    Integer process_rows = 0;
     
     ArrayList<Capacitador> capacitadores;
     Seguridad seguridad;
@@ -257,15 +256,16 @@ public class Principal extends javax.swing.JFrame {
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         if(t.isAlive()){
             t.interrupt();
+            t.stop();
+            t.destroy();
             ManageDialogsSwing.errorMessage("Error", "Proceso detenido por el usuario.");
         }
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnIniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarActionPerformed
-
-        process_rows = 0;
+        
         erroneosList = new ArrayList<>();
-
+        
         fillCapacitadores_Seguridad();
 
         if (capacitadores.size() > 0) {
@@ -290,8 +290,8 @@ public class Principal extends javax.swing.JFrame {
                             btnSel.setEnabled(false);
                             btnSelDestino.setEnabled(false);
 
-                            for (int row = 1; row < rows; row++) {
-
+                            for (row = 1; row < rows; row++) {
+                                
                                 if(!"0".equals(txtIniciarEn.getText())){
                                     row = ManageNumbers.stringToInteger(txtIniciarEn.getText())+1;
                                 }
@@ -317,11 +317,29 @@ public class Principal extends javax.swing.JFrame {
                                 repo.setEmpleado_id( StringUtils.leftPad(sheet.getRow(row).getCell(0).getStringCellValue(),4,"0") );
                                 repo.setNombre(sheet.getRow(row).getCell(1).getStringCellValue().toUpperCase());
                                 repo.setCurp(sheet.getRow(row).getCell(2).getStringCellValue().toUpperCase());
+                                
+                                if (repo.getCurp() == null) {
+                                    erroneosList.add(repo.getEmpleado_id() + "_ SIN CURP ERRONEO "  + (row+1) );
+                                    continue;
+                                } else {
+                                    if (repo.getCurp().length() < 18) {
+                                        erroneosList.add(repo.getEmpleado_id() + "_ CURP ERRONEO EN "  + (row+1) );
+                                        continue;
+                                    }
+                                }
+                                
                                 repo.setPuesto(sheet.getRow(row).getCell(3).getStringCellValue().toUpperCase());
                                 repo.setCurso(sheet.getRow(row).getCell(4).getStringCellValue().toUpperCase());
                                 repo.setDuracion(sheet.getRow(row).getCell(5).getStringCellValue());
-                                repo.setFecha_inicio(sheet.getRow(row).getCell(6).getDateCellValue());
-                                repo.setFecha_fin(sheet.getRow(row).getCell(7).getDateCellValue());
+                                
+                                try {
+                                    repo.setFecha_inicio(sheet.getRow(row).getCell(6).getDateCellValue());
+                                    repo.setFecha_fin(sheet.getRow(row).getCell(7).getDateCellValue());                                    
+                                } catch (Exception e) {
+                                    erroneosList.add(repo.getEmpleado_id() + "_ FECHA ERRONEA EN "  + (row+1) );
+                                    continue;
+                                }
+                                
                                 repo.setCine(sheet.getRow(row).getCell(8).getStringCellValue());
                                 repo.setRegion(sheet.getRow(row).getCell(9).getStringCellValue().replace("GR-", ""));
 
@@ -337,16 +355,6 @@ public class Principal extends javax.swing.JFrame {
 
                                 if (repo.getRegion().substring(0, 1).equals("0")) {
                                     repo.setRegion(repo.getRegion().replace("0", ""));
-                                }
-
-                                if (repo.getCurp() == null) {
-                                    erroneosList.add(repo.getEmpleado_id());
-                                    continue;
-                                } else {
-                                    if (repo.getCurp().length() < 18) {
-                                        erroneosList.add(repo.getEmpleado_id());
-                                        continue;
-                                    }
                                 }
 
                                 repo.setCorreo("121010802");
@@ -399,8 +407,8 @@ public class Principal extends javax.swing.JFrame {
                                     File fTemp = new File(directory + File.separator + repo.getEmpleado_id() + "_" + repo.getCurso() + ".pdf");
                                     
                                     if(fTemp.exists()){
-                                        JasperExportManager.exportReportToPdfFile(jasperPrint, directory + File.separator + repo.getEmpleado_id() + "_" + repo.getCurso() + "_DUPLICADO" + (row-1) + ".pdf");
-                                        erroneosList.add(repo.getEmpleado_id() + "_DUPLICADO EN "  + (row-1) );
+                                        JasperExportManager.exportReportToPdfFile(jasperPrint, directory + File.separator + repo.getEmpleado_id() + "_" + repo.getCurso() + "_DUPLICADO" + (row+1) + ".pdf");
+                                        erroneosList.add(repo.getEmpleado_id() + "_DUPLICADO EN "  + (row+1) );
                                     }else{
                                         JasperExportManager.exportReportToPdfFile(jasperPrint, directory + File.separator + repo.getEmpleado_id() + "_" + repo.getCurso() + ".pdf");
                                     }
@@ -416,9 +424,8 @@ public class Principal extends javax.swing.JFrame {
 //                                    break;
                                 }
 
-                                process_rows++;
                                 progressBar.setIndeterminate(true);
-                                lblInfo.setText("Procesando " + process_rows + " filas de " + (rows-1));
+                                lblInfo.setText("Procesando " + (row+1) + " filas de " + (rows));
                             }
 
                             btnIniciar.setEnabled(true);
@@ -426,7 +433,7 @@ public class Principal extends javax.swing.JFrame {
                             btnSelDestino.setEnabled(true);
                             progressBar.setIndeterminate(false);
 
-                            System.out.println("Proceso terminado. TOTAL ROWS LEIDAS :  " + process_rows);
+                            System.out.println("Proceso terminado. TOTAL ROWS LEIDAS :  " + (row+1));
                             System.out.println("Empleados erroneos " +  erroneosList.toString());
 
                             if (erroneosList.size() > 0) {
