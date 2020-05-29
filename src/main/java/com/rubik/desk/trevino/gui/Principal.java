@@ -404,13 +404,21 @@ public class Principal extends javax.swing.JFrame {
 
                                     JasperPrint jasperPrint = JasperFillManager.fillReport(report_pdf, params, new JRBeanCollectionDataSource(reporte));
                                     
-                                    File fTemp = new File(directory + File.separator + repo.getEmpleado_id() + "_" + repo.getCurso() + ".pdf");
+                                    //Separa por carpetas con el nombre del cine.
+                                    String nombre_cine = repo.getCine();
+                                    File carpeta_cine = new File(directory + File.separator + nombre_cine);
+                                    
+                                    if(!carpeta_cine.exists()){
+                                        carpeta_cine.mkdir();
+                                    }
+                                    
+                                    File fTemp = new File(carpeta_cine + File.separator + repo.getEmpleado_id() + "_" + repo.getCurso() + ".pdf");
                                     
                                     if(fTemp.exists()){
-                                        JasperExportManager.exportReportToPdfFile(jasperPrint, directory + File.separator + repo.getEmpleado_id() + "_" + repo.getCurso() + "_DUPLICADO" + (row+1) + ".pdf");
+                                        JasperExportManager.exportReportToPdfFile(jasperPrint, carpeta_cine + File.separator + repo.getEmpleado_id() + "_" + repo.getCurso() + "_DUPLICADO" + (row+1) + ".pdf");
                                         erroneosList.add(repo.getEmpleado_id() + "_DUPLICADO EN "  + (row+1) );
                                     }else{
-                                        JasperExportManager.exportReportToPdfFile(jasperPrint, directory + File.separator + repo.getEmpleado_id() + "_" + repo.getCurso() + ".pdf");
+                                        JasperExportManager.exportReportToPdfFile(jasperPrint, carpeta_cine + File.separator + repo.getEmpleado_id() + "_" + repo.getCurso() + ".pdf");
                                     }
 
                                 } catch (Exception ex) {
@@ -502,7 +510,7 @@ public class Principal extends javax.swing.JFrame {
         fchooser.addChoosableFileFilter(xlsFilter);
         fchooser.setAcceptAllFileFilterUsed(true);
         fchooser.setCurrentDirectory(new File(new File("").getAbsolutePath()));
-        fchooser.setDialogTitle("Seleccione el Archivo de SAP con el Layout establecido:");
+        fchooser.setDialogTitle("Seleccione el Archivo con el Layout establecido:");
         int result = fchooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
 
@@ -615,12 +623,12 @@ public class Principal extends javax.swing.JFrame {
                     sheet.getRow(row).getCell(7).setCellType(Cell.CELL_TYPE_STRING);
 
                     capacitador.setZona(sheet.getRow(row).getCell(0).getStringCellValue().toUpperCase());
-                    capacitador.setJefatura(sheet.getRow(row).getCell(1).getStringCellValue());
-                    capacitador.setEmpleado_id(sheet.getRow(row).getCell(2).getStringCellValue().replace(" ", ""));
+//                    capacitador.setJefatura(sheet.getRow(row).getCell(1).getStringCellValue());
+//                    capacitador.setEmpleado_id(sheet.getRow(row).getCell(2).getStringCellValue().replace(" ", ""));
                     capacitador.setNombre(sheet.getRow(row).getCell(3).getStringCellValue());
-                    capacitador.setCorreo(sheet.getRow(row).getCell(4).getStringCellValue());
+//                    capacitador.setCorreo(sheet.getRow(row).getCell(4).getStringCellValue());
                     capacitador.setRegion(sheet.getRow(row).getCell(5).getStringCellValue());
-                    capacitador.setUbicacion(sheet.getRow(row).getCell(6).getStringCellValue());
+//                    capacitador.setUbicacion(sheet.getRow(row).getCell(6).getStringCellValue());
                     capacitador.setFile(sheet.getRow(row).getCell(7).getStringCellValue());
 
                     capacitadores.add(capacitador);
